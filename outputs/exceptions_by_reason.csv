@@ -1,0 +1,8 @@
+reason,description,invoices,amount_at_risk
+NOT_RECEIVED,Nothing received against this PO yet,3,11415.26
+TOTAL_MISMATCH,Invoice amount does not equal quantity x unit price,1,11413.08
+QTY_OVER_RECEIVED,Billed quantity is more than received and not yet billed,3,7910.62
+DUPLICATE,Same vendor and invoice number already received,2,5761.58
+NO_PO,PO number missing or not found,2,2405.00
+PRICE_VARIANCE,Unit price more than 2% above the PO price,4,1843.08
+VENDOR_MISMATCH,Invoice vendor is not the vendor on the PO,1,1606.64

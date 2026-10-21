@@ -1,0 +1,16 @@
+Subject: InvoiceFlow: 16 invoices need review
+
+File: incoming/invoices_2026-10.csv
+Invoices: 43  |  matched and cleared for payment: 27 ($103,431.60)
+On hold for review: 16  |  $ not supported by PO/receipt: $42,355.26
+
+By reason:
+  NOT_RECEIVED         3 invoices  $   11,415.26  Nothing received against this PO yet
+  TOTAL_MISMATCH       1 invoices  $   11,413.08  Invoice amount does not equal quantity x unit price
+  QTY_OVER_RECEIVED    3 invoices  $    7,910.62  Billed quantity is more than received and not yet billed
+  DUPLICATE            2 invoices  $    5,761.58  Same vendor and invoice number already received
+  NO_PO                2 invoices  $    2,405.00  PO number missing or not found
+  PRICE_VARIANCE       4 invoices  $    1,843.08  Unit price more than 2% above the PO price
+  VENDOR_MISMATCH      1 invoices  $    1,606.64  Invoice vendor is not the vendor on the PO
+
+Full results: s3://local/reports/invoices_2026-10-results.csv
