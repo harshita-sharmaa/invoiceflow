@@ -1,0 +1,12 @@
+{
+  "Records": [
+    {
+      "eventSource": "aws:s3",
+      "eventName": "ObjectCreated:Put",
+      "s3": {
+        "bucket": {"name": "invoiceflow-123456789012-us-west-2"},
+        "object": {"key": "incoming/invoices_2026-10.csv"}
+      }
+    }
+  ]
+}
