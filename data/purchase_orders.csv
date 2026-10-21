@@ -1,0 +1,41 @@
+po_number,vendor_id,vendor_name,item,qty_ordered,unit_price,ordered_on
+PO-26-1001,V130,Summit Lab Equipment,Beaker set,43,71.82,2026-09-06
+PO-26-1002,V120,Redwood Furniture Co,Faculty desk,12,610.67,2026-09-11
+PO-26-1003,V160,Golden Gate AV Systems,Projector,8,1352.79,2026-09-17
+PO-26-1004,V100,Campus Office Supply,Desk organizer,19,25.05,2026-08-12
+PO-26-1005,V130,Summit Lab Equipment,Beaker set,53,73.88,2026-08-27
+PO-26-1006,V130,Summit Lab Equipment,Beaker set,52,70.53,2026-08-21
+PO-26-1007,V110,Bayline IT Solutions,Monitor 27in,5,275.82,2026-09-01
+PO-26-1008,V150,Pioneer Print & Copy,Course packet,59,17.86,2026-09-16
+PO-26-1009,V100,Campus Office Supply,Toner cartridge,44,114.43,2026-08-27
+PO-26-1010,V120,Redwood Furniture Co,Classroom chair,13,92.15,2026-09-06
+PO-26-1011,V100,Campus Office Supply,Toner cartridge,43,114.67,2026-09-21
+PO-26-1012,V150,Pioneer Print & Copy,Brochure print run,2,634.06,2026-08-29
+PO-26-1013,V110,Bayline IT Solutions,Laptop,12,1132.03,2026-08-18
+PO-26-1014,V120,Redwood Furniture Co,Bookshelf,27,219.65,2026-09-20
+PO-26-1015,V150,Pioneer Print & Copy,Course packet,29,17.95,2026-09-17
+PO-26-1016,V100,Campus Office Supply,Copy paper (case),38,42.28,2026-08-10
+PO-26-1017,V100,Campus Office Supply,Desk organizer,44,23.24,2026-08-05
+PO-26-1018,V160,Golden Gate AV Systems,Projector,8,1263.19,2026-08-13
+PO-26-1019,V140,Coastal Facilities Services,HVAC filter,9,37.44,2026-09-10
+PO-26-1020,V100,Campus Office Supply,Desk organizer,39,25.00,2026-08-04
+PO-26-1021,V140,Coastal Facilities Services,Floor cleaner (drum),25,159.95,2026-09-13
+PO-26-1022,V100,Campus Office Supply,Copy paper (case),18,40.37,2026-08-31
+PO-26-1023,V140,Coastal Facilities Services,HVAC filter,43,34.72,2026-09-04
+PO-26-1024,V160,Golden Gate AV Systems,HDMI switcher,49,170.07,2026-08-08
+PO-26-1025,V120,Redwood Furniture Co,Bookshelf,14,200.43,2026-08-28
+PO-26-1026,V150,Pioneer Print & Copy,Brochure print run,7,620.83,2026-08-30
+PO-26-1027,V130,Summit Lab Equipment,Beaker set,5,74.00,2026-09-05
+PO-26-1028,V110,Bayline IT Solutions,Laptop,3,1116.03,2026-08-12
+PO-26-1029,V100,Campus Office Supply,Desk organizer,51,25.13,2026-09-06
+PO-26-1030,V120,Redwood Furniture Co,Bookshelf,8,220.19,2026-08-27
+PO-26-1031,V110,Bayline IT Solutions,Docking station,18,224.35,2026-08-24
+PO-26-1032,V130,Summit Lab Equipment,Microscope,6,869.12,2026-08-19
+PO-26-1033,V130,Summit Lab Equipment,Beaker set,57,74.18,2026-09-09
+PO-26-1034,V150,Pioneer Print & Copy,Banner,55,123.14,2026-08-20
+PO-26-1035,V140,Coastal Facilities Services,LED panel,55,90.90,2026-08-06
+PO-26-1036,V160,Golden Gate AV Systems,Projector,11,1326.22,2026-08-22
+PO-26-1037,V140,Coastal Facilities Services,HVAC filter,41,37.71,2026-08-19
+PO-26-1038,V160,Golden Gate AV Systems,HDMI switcher,43,166.76,2026-09-17
+PO-26-1039,V130,Summit Lab Equipment,Lab goggles (box),58,56.82,2026-08-03
+PO-26-1040,V100,Campus Office Supply,Copy paper (case),48,43.02,2026-09-10
