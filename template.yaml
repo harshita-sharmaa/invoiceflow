@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  InvoiceFlow - serverless three-way match for accounts payable.
+  Invoice CSV lands in S3 -> Lambda matches it against POs and receipts in DynamoDB ->
+  clean invoices are cleared, exceptions go to a review queue (HTTP API) and AP gets an SNS email.
+
+Parameters:
+  AlertEmail:
+    Type: String
+    Description: Email that receives the exception summary (confirm the SNS subscription email after deploy)
+
+Globals:
+  Function:
+    Runtime: python3.12
+    CodeUri: src/
+    MemorySize: 256
+    Timeout: 60
+    Tracing: Active
+    Environment:
+      Variables:
+        PO_TABLE: !Ref PurchaseOrdersTable
+        INVOICE_TABLE: !Ref InvoicesTable
+
+Resources:
+  InvoiceBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      # Fixed name so the function policy can reference it without a circular dependency on the S3 trigger.
+      BucketName: !Sub invoiceflow-${AWS::AccountId}-${AWS::Region}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-old-reports
+            Prefix: reports/
+            Status: Enabled
+            ExpirationInDays: 365
+
+  PurchaseOrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: po_number
+          AttributeType: S
+      KeySchema:
+        - AttributeName: po_number
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  InvoicesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: invoice_key
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+        - AttributeName: invoice_date
+          AttributeType: S
+      KeySchema:
+        - AttributeName: invoice_key
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: status-index
+          KeySchema:
+            - AttributeName: status
+              KeyType: HASH
+            - AttributeName: invoice_date
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  AlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref AlertEmail
+
+  MatchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: match_handler.handler
+      Description: Three-way match for each invoice CSV uploaded to incoming/
+      Environment:
+        Variables:
+          ALERT_TOPIC_ARN: !Ref AlertsTopic
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Sub invoiceflow-${AWS::AccountId}-${AWS::Region}
+        - Statement:
+            - Effect: Allow
+              Action: s3:PutObject
+              Resource: !Sub arn:aws:s3:::invoiceflow-${AWS::AccountId}-${AWS::Region}/reports/*
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PurchaseOrdersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref InvoicesTable
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt AlertsTopic.TopicName
+      Events:
+        InvoiceUploaded:
+          Type: S3
+          Properties:
+            Bucket: !Ref InvoiceBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: incoming/
+                  - Name: suffix
+                    Value: .csv
+
+  MatchFunctionErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: The invoice match function failed
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref MatchFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref AlertsTopic
+
+  ReviewApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        EnableIamAuthorizer: true
+        DefaultAuthorizer: AWS_IAM
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api_handler.handler
+      Description: AP review queue - list, inspect and resolve invoice exceptions
+      Timeout: 15
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref InvoicesTable
+      Events:
+        Summary:
+          Type: HttpApi
+          Properties: {ApiId: !Ref ReviewApi, Method: GET, Path: /summary}
+        ListInvoices:
+          Type: HttpApi
+          Properties: {ApiId: !Ref ReviewApi, Method: GET, Path: /invoices}
+        GetInvoice:
+          Type: HttpApi
+          Properties: {ApiId: !Ref ReviewApi, Method: GET, Path: "/invoices/{key}"}
+        ResolveInvoice:
+          Type: HttpApi
+          Properties: {ApiId: !Ref ReviewApi, Method: POST, Path: "/invoices/{key}/resolve"}
+
+Outputs:
+  BucketName:
+    Description: Upload invoice CSVs to s3://<this>/incoming/
+    Value: !Ref InvoiceBucket
+  ApiUrl:
+    Description: Review queue API (IAM auth - call with awscurl or a signed request)
+    Value: !Sub https://${ReviewApi}.execute-api.${AWS::Region}.amazonaws.com
+  PurchaseOrdersTableName:
+    Value: !Ref PurchaseOrdersTable
+  InvoicesTableName:
+    Value: !Ref InvoicesTable

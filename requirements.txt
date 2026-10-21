@@ -1,0 +1,3 @@
+# Only needed for scripts/seed_dynamodb.py. The Lambda runtime already includes boto3,
+# and the local demo and tests use the standard library only.
+boto3
